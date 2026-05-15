@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template_string
+from hanspell import spell_checker
 
 app = Flask(__name__)
 
@@ -10,11 +11,14 @@ HTML = """
 </head>
 <body>
     <h1>맞춤법 검사기</h1>
-    <textarea id="text" rows="6" cols="50"></textarea><br>
+
+    <textarea id="text" rows="6" cols="50" placeholder="문장을 입력하세요"></textarea>
+    <br><br>
+
     <button onclick="check()">검사</button>
 
     <h3>결과</h3>
-    <div id="result"></div>
+    <div id="result" style="white-space: pre-wrap;"></div>
 
     <script>
         async function check() {
@@ -22,14 +26,17 @@ HTML = """
 
             const res = await fetch("/check", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({text})
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text })
             });
 
             const data = await res.json();
             document.getElementById("result").innerText = data.result;
         }
     </script>
+
 </body>
 </html>
 """
@@ -44,9 +51,11 @@ def check():
     data = request.get_json()
     text = data.get("text", "")
 
-    # 👉 여기서 맞춤법 라이브러리 연결 (임시 로직)
-    # 지금은 간단 테스트용
-    corrected = text.replace("않되", "안 돼").replace("되요", "돼요")
+    try:
+        result = spell_checker.check(text)
+        corrected = result.checked
+    except Exception as e:
+        corrected = f"에러 발생: {str(e)}"
 
     return jsonify({"result": corrected})
 
