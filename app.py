@@ -1,10 +1,11 @@
+import os
 from flask import Flask, request, jsonify, render_template_string
 from openai import OpenAI
-import os
 
 app = Flask(__name__)
 
-client = OpenAI(api_key="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")  # ← 여기에 키 넣기
+# ✅ 환경변수에서 API 키 가져오기 (배포 정석)
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 HTML = """
 <!DOCTYPE html>
@@ -15,13 +16,13 @@ HTML = """
 <body>
     <h1>맞춤법 검사기</h1>
 
-    <textarea id="text" rows="6" cols="50"></textarea>
+    <textarea id="text" rows="6" cols="50" placeholder="문장을 입력하세요"></textarea>
     <br><br>
 
     <button onclick="check()">검사</button>
 
     <h3>결과</h3>
-    <div id="result"></div>
+    <div id="result" style="white-space: pre-wrap;"></div>
 
     <script>
         async function check() {
@@ -29,8 +30,10 @@ HTML = """
 
             const res = await fetch("/check", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({text})
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text })
             });
 
             const data = await res.json();
@@ -40,6 +43,7 @@ HTML = """
 </body>
 </html>
 """
+
 
 @app.route("/")
 def home():
@@ -51,13 +55,16 @@ def check():
     data = request.get_json()
     text = data.get("text", "")
 
+    if not text.strip():
+        return jsonify({"result": "입력된 문장이 없습니다."})
+
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
-                    "content": "너는 한국어 맞춤법 교정기야. 문장을 자연스럽게 교정해서 결과만 출력해."
+                    "content": "너는 한국어 맞춤법 교정기야. 문장을 자연스럽게 수정하고 결과만 출력해."
                 },
                 {
                     "role": "user",
@@ -66,10 +73,10 @@ def check():
             ]
         )
 
-        corrected = response.choices[0].message.content
+        corrected = response.choices[0].message.content.strip()
 
     except Exception as e:
-        corrected = f"에러: {str(e)}"
+        corrected = f"에러 발생: {str(e)}"
 
     return jsonify({"result": corrected})
 
