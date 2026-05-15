@@ -4,31 +4,65 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
+# Groq API 연결
 client = OpenAI(
     api_key=os.environ["GROQ_API_KEY"],
     base_url="https://api.groq.com/openai/v1"
 )
 
+# 웹페이지 HTML
 HTML = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI 맞춤법 검사기</title>
+    <title>무료 AI 맞춤법 검사기</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
+
     <h1>무료 AI 맞춤법 검사기</h1>
 
-    <textarea id="text" rows="6" cols="50"></textarea>
-    <br><br>
+    <textarea id="text" placeholder="문장을 입력하세요"></textarea>
+    <br>
 
-    <button onclick="check()">검사</button>
+    <button onclick="check()">맞춤법 검사</button>
 
-    <h3>결과:</h3>
     <div id="result"></div>
 
     <script>
         async function check() {
             const text = document.getElementById("text").value;
+
+            document.getElementById("result").innerText = "검사 중...";
 
             const response = await fetch("/check", {
                 method: "POST",
@@ -43,6 +77,7 @@ HTML = """
             document.getElementById("result").innerText = data.result;
         }
     </script>
+
 </body>
 </html>
 """
@@ -51,6 +86,7 @@ HTML = """
 def home():
     return render_template_string(HTML)
 
+
 @app.route("/check", methods=["POST"])
 def check():
     data = request.get_json()
@@ -58,17 +94,18 @@ def check():
 
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
-                    "content": "너는 한국어 맞춤법 검사기다. 문장을 자연스럽고 올바르게 수정해서 결과만 출력해라."
+                    "content": "너는 한국어 맞춤법 검사기다. 사용자의 문장을 자연스럽고 올바른 맞춤법으로 수정해서 결과만 출력해라."
                 },
                 {
                     "role": "user",
                     "content": text
                 }
-            ]
+            ],
+            temperature=0.2
         )
 
         result = response.choices[0].message.content
@@ -78,5 +115,7 @@ def check():
 
     return jsonify({"result": result})
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
