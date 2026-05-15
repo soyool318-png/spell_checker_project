@@ -4,31 +4,33 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
-# ✅ 환경변수에서 API 키 가져오기 (배포 정석)
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+client = OpenAI(
+    api_key=os.environ["GROQ_API_KEY"],
+    base_url="https://api.groq.com/openai/v1"
+)
 
 HTML = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>맞춤법 검사기</title>
+    <title>AI 맞춤법 검사기</title>
 </head>
 <body>
-    <h1>맞춤법 검사기</h1>
+    <h1>무료 AI 맞춤법 검사기</h1>
 
-    <textarea id="text" rows="6" cols="50" placeholder="문장을 입력하세요"></textarea>
+    <textarea id="text" rows="6" cols="50"></textarea>
     <br><br>
 
     <button onclick="check()">검사</button>
 
-    <h3>결과</h3>
-    <div id="result" style="white-space: pre-wrap;"></div>
+    <h3>결과:</h3>
+    <div id="result"></div>
 
     <script>
         async function check() {
             const text = document.getElementById("text").value;
 
-            const res = await fetch("/check", {
+            const response = await fetch("/check", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -36,7 +38,8 @@ HTML = """
                 body: JSON.stringify({ text })
             });
 
-            const data = await res.json();
+            const data = await response.json();
+
             document.getElementById("result").innerText = data.result;
         }
     </script>
@@ -44,27 +47,22 @@ HTML = """
 </html>
 """
 
-
 @app.route("/")
 def home():
     return render_template_string(HTML)
-
 
 @app.route("/check", methods=["POST"])
 def check():
     data = request.get_json()
     text = data.get("text", "")
 
-    if not text.strip():
-        return jsonify({"result": "입력된 문장이 없습니다."})
-
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama3-8b-8192",
             messages=[
                 {
                     "role": "system",
-                    "content": "너는 한국어 맞춤법 교정기야. 문장을 자연스럽게 수정하고 결과만 출력해."
+                    "content": "너는 한국어 맞춤법 검사기다. 문장을 자연스럽고 올바르게 수정해서 결과만 출력해라."
                 },
                 {
                     "role": "user",
@@ -73,14 +71,12 @@ def check():
             ]
         )
 
-        corrected = response.choices[0].message.content.strip()
+        result = response.choices[0].message.content
 
     except Exception as e:
-        corrected = f"에러 발생: {str(e)}"
+        result = f"에러 발생: {str(e)}"
 
-    return jsonify({"result": corrected})
-
+    return jsonify({"result": result})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
