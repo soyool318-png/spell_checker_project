@@ -1,1 +1,4 @@
 flask
+gunicorn
+requests
+git+https://github.com/ssut/py-hanspell.git
