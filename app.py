@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-client = OpenAI(api_key="YOUR_API_KEY")  # ← 여기에 키 넣기
+client = OpenAI(api_key="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")  # ← 여기에 키 넣기
 
 HTML = """
 <!DOCTYPE html>
