@@ -108,6 +108,7 @@ def check():
 만 수정해라.
 
 문체, 말투, 의미, 어조는 절대 바꾸지 마라.
+불필요하게 존댓말로 바꾸지 마라.
 원문 느낌을 최대한 유지해라.
 
 영어 문장이 들어오면:
@@ -119,6 +120,7 @@ def check():
 화살표(->)를 사용하지 마라.
 원문과 비교하지 마라.
 추가 문장을 쓰지 마라.
+만약 화살표가 들어가는 문장이 있다면 그 문장은 지우고 다음 문장만 출력해라.
 """
                 },
                 {
@@ -129,20 +131,7 @@ def check():
             temperature=0.2
         )
 
-        try:
-    response = client.chat.completions.create(
-        ...
-    )
-
-    result = response.choices[0].message.content.strip()
-
-    if "->" in result:
-        result = result.split("->")[-1].strip()
-
-    result = result.split("\n")[-1].strip()
-
-except Exception as e:
-    result = f"에러 발생: {str(e)}"
+       result = response.choices[0].message.content
 
     except Exception as e:
         result = f"에러 발생: {str(e)}"
