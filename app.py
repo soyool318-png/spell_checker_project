@@ -129,14 +129,20 @@ def check():
             temperature=0.2
         )
 
-        result = response.choices[0].message.content.strip()
+        try:
+    response = client.chat.completions.create(
+        ...
+    )
 
-# 화살표 형식 제거
-if "->" in result:
-    result = result.split("->")[-1].strip()
+    result = response.choices[0].message.content.strip()
 
-# 줄 여러 개면 마지막 줄만 사용
-result = result.split("\n")[-1].strip()
+    if "->" in result:
+        result = result.split("->")[-1].strip()
+
+    result = result.split("\n")[-1].strip()
+
+except Exception as e:
+    result = f"에러 발생: {str(e)}"
 
     except Exception as e:
         result = f"에러 발생: {str(e)}"
