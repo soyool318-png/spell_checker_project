@@ -15,7 +15,7 @@ HTML = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>한글/영어 맞춤법 검사기</title>
+    <title>무료 AI 맞춤법 검사기</title>
     <style>
         body {
             font-family: Arial;
@@ -49,7 +49,7 @@ HTML = """
 </head>
 <body>
 
-    <h1>한글/영어 맞춤법 검사기</h1>
+    <h1>무료 AI 맞춤법 검사기</h1>
 
     <textarea id="text" placeholder="문장을 입력하세요"></textarea>
     <br>
@@ -115,12 +115,8 @@ def check():
 - 번역하지 마라.
 - 영어 철자와 문법만 수정해라.
 
-수정된 문장만 출력해라.
-설명하지 마라.
-화살표(->)를 사용하지 마라.
-원문과 비교하지 마라.
-추가 문장을 쓰지 마라.
-만약 화살표가 들어가는 문장이 있다면 그 문장은 지우고 다음 문장만 출력해라.
+수정된 결과만 출력해라.
+화살표는 결과값에 넣지마라.
 """
                 },
                 {
@@ -131,7 +127,7 @@ def check():
             temperature=0.2
         )
 
-       result = response.choices[0].message.content
+        result = response.choices[0].message.content
 
     except Exception as e:
         result = f"에러 발생: {str(e)}"
