@@ -49,7 +49,7 @@ HTML = """
 </head>
 <body>
 
-    <h1>무료 AI 맞춤법 검사기</h1>
+    <h1>한글/영어 맞춤법 검사기</h1>
 
     <textarea id="text" placeholder="문장을 입력하세요"></textarea>
     <br>
