@@ -133,6 +133,9 @@ def check():
 
        result = response.choices[0].message.content
 
+    except Exception as e:
+        result = f"에러 발생: {str(e)}"
+
     return jsonify({"result": result})
 
 
