@@ -179,8 +179,7 @@ def check():
         result = highlighted
 
     except Exception as e:
-
-    result = f"에러 발생: {str(e)}"
+        result = f"에러 발생: {str(e)}"
     return jsonify({"result": result})
 
 
