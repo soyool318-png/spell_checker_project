@@ -121,10 +121,6 @@ def check():
     data = request.get_json()
     text = data.get("text", "")
 
-    # 자주 틀리는 표현 미리 교정
-    text = text.replace("안코", "않고")
-    text = text.replace("화십", "하십")
-
     try:
 
         response = client.chat.completions.create(
@@ -142,11 +138,9 @@ def check():
 - 오타
 를 수정해라.
 
-필요한 부분만 최소한으로 수정해라.
-문장을 더 자연스럽게 바꾸려고 하지 마라.
-
 가능한 한 원문의 글자와 형태를 유지한 채 수정해라.
-한 단어를 완전히 다른 단어로 바꾸지 마라.
+표현을 완전히 다른 표현으로 바꾸지 마라.
+예를 들면, 다나까체를 요체로 바꾸지 마라.
 
 문체, 말투, 의미, 어조는 유지해라.
 존댓말/반말을 임의로 바꾸지 마라.
