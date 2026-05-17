@@ -138,9 +138,9 @@ def check():
 - 오타
 만 수정해라.
 
-최대한 원문을 유지한 채 필요한 부분을 최소한으로 수정해라.
 문체, 말투, 의미, 어조를 바꾸지 마라.
 존댓말/반말을 임의로 변형하지 마라.
+한국어 문법, 어법, 단어, 철자에 맞게 정확하게 교정해라.
 
 인터넷 말투와 구어체도 한국어 문법에 맞게 교정해라.
 
@@ -162,7 +162,8 @@ def check():
                 }
             ],
 
-            temperature=0.2,
+            temperature=0,
+            top_p=0.1,
             max_tokens=200
         )
 
@@ -179,8 +180,7 @@ def check():
 
     except Exception as e:
 
-        result = text
-
+    result = f"에러 발생: {str(e)}"
     return jsonify({"result": result})
 
 
